@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>phosor.ai — Configure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#06050a;--deep:#0c0a14;--surface:#110f1c;--surface2:#18152a;--surface3:#201c38;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --violet:#5b21b6;--violet-bright:#7c3aed;--amethyst:#a855f7;--electric:#06b6d4;
+  --gold:#d4af6a;--text:#ede9fe;--text2:#c4b5fd;--muted:#6b6490;--muted2:#9490b0;--green:#10b981;
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--black);color:var(--text)}
+body::before{content:'';position:fixed;inset:0;z-index:1000;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 20px rgba(168,85,247,.2),inset 0 0 20px rgba(168,85,247,.03)}50%{box-shadow:0 0 36px rgba(168,85,247,.38),inset 0 0 30px rgba(168,85,247,.06)}}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(168,85,247,.5)}70%{box-shadow:0 0 0 6px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+
+.app-shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--deep);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sidebar-logo{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--text);padding:20px 20px 16px;letter-spacing:.3px}
+.sidebar-logo em{font-style:normal;color:var(--amethyst)}
+.sidebar-sect{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:16px 20px 6px}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 20px;font-size:13.5px;color:var(--muted2);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.proj-header{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:var(--muted2);cursor:pointer;transition:color .15s;user-select:none}
+.proj-header:hover{color:var(--text2)}
+.proj-chev{font-size:9px;color:var(--muted);width:10px;flex-shrink:0;transition:transform .2s}
+.proj-chev.open{transform:rotate(90deg)}
+.proj-sub{display:flex;align-items:center;gap:8px;padding:6px 20px 6px 42px;font-size:12.5px;color:var(--muted);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.proj-sub:hover{color:var(--text2)}
+.proj-sub.active{color:var(--amethyst);background:rgba(168,85,247,.07);border-left-color:var(--amethyst)}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--amethyst));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.sidebar-uname{font-size:13px;font-weight:500;color:var(--text2)}
+.sidebar-plan{font-size:11px;color:var(--muted);font-family:var(--mono)}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;background:rgba(8,6,16,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;flex-shrink:0;z-index:100}
+.topbar-bc{font-size:13px;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-bc-cur{color:var(--text2);font-weight:500}
+.topbar-steps{margin-left:auto;display:flex;align-items:center}
+.step-pip{display:flex;align-items:center}
+.step-btn{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:6px;background:none;border:none;cursor:default;font-family:var(--sans);font-size:12px;color:var(--muted);white-space:nowrap;text-decoration:none}
+.step-btn.clickable{cursor:pointer}
+.step-btn.clickable:hover{color:var(--text2)}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);flex-shrink:0}
+.step-btn.done .step-num{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.4);color:var(--amethyst)}
+.step-btn.active .step-num{background:var(--amethyst);border-color:var(--amethyst);color:#fff;animation:pulse-ring 2s infinite}
+.step-btn.active{color:var(--amethyst)}
+.step-line{width:18px;height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+.step-line.done{background:rgba(168,85,247,.3)}
+
+.content-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+.content-inner{max-width:720px;margin:0 auto;padding:40px 40px 80px;animation:fadeSlideUp .45s ease both}
+
+.page-header{margin-bottom:32px}
+.step-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--amethyst);margin-bottom:10px}
+.step-badge-num{width:20px;height:20px;border-radius:50%;background:var(--amethyst);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.page-title{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.07;letter-spacing:-.5px;color:var(--text);margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--muted2);line-height:1.55}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px}
+
+/* RADIO GROUP */
+.field-label{font-size:11px;font-weight:600;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;font-family:var(--mono)}
+.radio-group{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.radio-opt{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;border:1px solid var(--border);cursor:pointer;transition:all .18s;background:var(--deep)}
+.radio-opt:hover{border-color:rgba(168,85,247,.3)}
+.radio-opt.sel{border-color:rgba(168,85,247,.42);background:rgba(168,85,247,.055)}
+.radio-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
+.radio-opt.sel .radio-dot{border-color:var(--amethyst)}
+.radio-dot-inner{width:7px;height:7px;border-radius:50%;background:var(--amethyst);opacity:0;transition:opacity .2s}
+.radio-opt.sel .radio-dot-inner{opacity:1}
+.radio-lbl{font-size:13.5px;color:var(--text2);font-weight:500}
+.radio-sub{font-size:12px;color:var(--muted);margin-left:6px}
+.radio-badge{margin-left:auto;font-size:11px;font-family:var(--mono);padding:3px 9px;border-radius:4px;background:rgba(168,85,247,.1);color:var(--amethyst)}
+
+/* SELECT */
+.select-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.select-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);margin-bottom:7px;font-family:var(--mono)}
+.sel-input{
+  width:100%;background:var(--deep);border:1px solid var(--border2);border-radius:8px;
+  padding:9px 32px 9px 14px;font-family:var(--sans);font-size:13.5px;color:var(--text);
+  outline:none;cursor:pointer;transition:border-color .2s;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6490' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+}
+.sel-input:focus{border-color:rgba(168,85,247,.4)}
+.sel-input option{background:var(--surface)}
+
+/* TEXTAREA */
+.ta-field{margin-bottom:20px}
+.ta-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);margin-bottom:7px;font-family:var(--mono)}
+.config-ta{width:100%;background:var(--deep);border:1px solid var(--border2);border-radius:8px;padding:11px 14px;font-family:var(--sans);font-size:13px;color:var(--text);resize:vertical;min-height:76px;outline:none;transition:border-color .2s;line-height:1.6}
+.config-ta:focus{border-color:rgba(168,85,247,.4)}
+
+/* ADVANCED */
+.adv-toggle{display:flex;align-items:center;gap:9px;padding:12px 0;cursor:pointer;user-select:none;border-top:1px solid var(--border);margin-top:4px;font-size:13px;color:var(--muted2);transition:color .2s}
+.adv-toggle:hover{color:var(--text2)}
+.adv-chev{width:14px;height:14px;transition:transform .28s;margin-left:auto}
+.adv-chev.open{transform:rotate(180deg)}
+.adv-content{overflow:hidden;transition:max-height .38s ease,opacity .28s;max-height:0;opacity:0}
+.adv-content.open{max-height:600px;opacity:1}
+.adv-inner{padding-top:18px;display:flex;flex-direction:column;gap:16px}
+
+/* ESTIMATE BOX */
+.estimate-box{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;border-radius:12px;overflow:hidden;border:1px solid rgba(168,85,247,.22);background:rgba(168,85,247,.06);margin-bottom:28px;animation:glow-pulse 3s ease-in-out infinite}
+.est-col{background:var(--deep);padding:18px 20px;text-align:center}
+.est-val{font-family:var(--serif);font-size:28px;font-weight:600;color:var(--text);margin-bottom:4px}
+.est-lbl{font-size:11px;font-family:var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+.est-col.credits .est-val{color:var(--amethyst)}
+.est-col.balance .est-val{color:var(--electric)}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:10px;font-size:14.5px;font-weight:600;background:linear-gradient(135deg,var(--violet),var(--amethyst));color:#fff;border:none;cursor:pointer;box-shadow:0 0 26px rgba(168,85,247,.3),inset 0 1px 0 rgba(255,255,255,.1);transition:all .22s;text-decoration:none}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(168,85,247,.48)}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:11px 20px;border-radius:9px;font-size:13.5px;font-weight:500;border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-ghost:hover{border-color:rgba(255,255,255,.24);color:var(--text)}
+.cta-row{display:flex;align-items:center;gap:14px}
+
+.info-note{font-size:13.5px;color:var(--muted2);margin-bottom:24px;padding:12px 18px;background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.14);border-radius:8px;display:flex;align-items:center;gap:10px}
+
+.glow-a{position:fixed;top:60px;left:200px;width:480px;height:480px;border-radius:50%;background:radial-gradient(circle,rgba(91,33,182,.08) 0%,transparent 70%);pointer-events:none;z-index:-1}
+</style>
+</head>
+<body>
+<div class="glow-a"></div>
+
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">phosor<em>.</em>ai</div>
+    <div class="sidebar-sect">Workspace</div>
+    <a href="01-homepage.html" class="sidebar-item">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Home
+    </a>
+    <div class="sidebar-sect">Projects</div>
+    <div>
+      <div class="proj-header open" onclick="toggleProj(this)">
+        <span class="proj-chev open">▶</span>
+        <span style="font-size:15px">🎬</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Echoes of Aurora</span>
+      </div>
+      <div class="proj-children">
+        <a href="02-creation-flow.html" class="proj-sub active">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5L8 2z" fill="currentColor" opacity=".7"/></svg>
+          Creation
+        </a>
+        <a href="08-timeline-editor.html" class="proj-sub">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="10" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="4" r="1.5" fill="currentColor" opacity=".6"/></svg>
+          Timeline
+        </a>
+      </div>
+    </div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌃</span><span style="flex:1;color:var(--muted)">Neon District</span></div></div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌊</span><span style="flex:1;color:var(--muted)">Deep Current</span></div></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-avatar">H</div>
+      <div><div class="sidebar-uname">Hugo</div><div class="sidebar-plan">Pro Plan</div></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-bc">
+        <span>Echoes of Aurora</span>
+        <span style="color:var(--muted)">›</span>
+        <span class="topbar-bc-cur">Configure</span>
+      </div>
+      <div class="topbar-steps">
+        <div class="step-pip"><a href="02-creation-flow.html" class="step-btn clickable done"><div class="step-num">1</div><span>Input</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><div class="step-btn active"><div class="step-num">2</div><span>Configure</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">3</div><span>Scripts</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">4</div><span>Assets</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">5</div><span>Video</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">6</div><span>Merge</span></div></div>
+      </div>
+    </div>
+
+    <div class="content-scroll">
+      <div class="content-inner">
+
+        <div class="page-header">
+          <div class="step-badge"><div class="step-badge-num">2</div>Configure</div>
+          <h1 class="page-title">Configure your film</h1>
+          <p class="page-sub">Defaults are tuned for great results — skip straight to Generate if unsure.</p>
+        </div>
+
+        <div class="info-note">
+          <span style="font-size:16px">💡</span>
+          Most users get great results without changing anything. Defaults are optimized for vertical short drama.
+        </div>
+
+        <div class="card">
+          <p class="field-label">Resolution</p>
+          <div class="radio-group" id="resGroup">
+            <label class="radio-opt sel" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">720 × 1280</span>
+              <span class="radio-sub">Vertical · Fast render</span>
+              <span class="radio-badge">Default</span>
+            </label>
+            <label class="radio-opt" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">1080 × 1920</span>
+              <span class="radio-sub">Vertical HD · TikTok / Reels</span>
+            </label>
+            <label class="radio-opt" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">1920 × 1080</span>
+              <span class="radio-sub">Landscape · YouTube / Desktop</span>
+            </label>
+          </div>
+
+          <div class="select-row">
+            <div class="select-field">
+              <label>Frame Rate</label>
+              <select class="sel-input">
+                <option>16 fps — Fast</option>
+                <option selected>24 fps — Cinematic</option>
+                <option>30 fps — Standard</option>
+              </select>
+            </div>
+            <div class="select-field">
+              <label>Max Shot Duration</label>
+              <select class="sel-input">
+                <option>5 seconds</option>
+                <option selected>8 seconds</option>
+                <option>12 seconds</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="select-row">
+            <div class="select-field" style="grid-column:1/-1">
+              <label>Video Generation Model</label>
+              <select class="sel-input">
+                <option selected>Wan2.1 Standard — Fast · 42 credits</option>
+                <option>Wan2.1 Pro — High Quality · 70 credits</option>
+                <option>Kling 1.6 — Experimental · 55 credits</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ta-field">
+            <label>Global Style Prompt</label>
+            <textarea class="config-ta">Cinematic, shallow depth of field, high contrast, film grain, color graded in teal and orange, anamorphic lens flare, professional lighting</textarea>
+          </div>
+          <div class="ta-field" style="margin-bottom:0">
+            <label>Global Negative Prompt</label>
+            <textarea class="config-ta">blurry, low quality, watermark, text overlay, distorted faces, cartoon, anime, amateur</textarea>
+          </div>
+
+          <div class="adv-toggle" onclick="toggleAdv()">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6" stroke="var(--muted2)" stroke-width="1.4"/><path d="M6 6h2v5M6 11h4" stroke="var(--muted2)" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Advanced settings
+            <svg class="adv-chev" id="advChev" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="adv-content" id="advContent">
+            <div class="adv-inner">
+              <div class="select-row">
+                <div class="select-field">
+                  <label>Image Model</label>
+                  <select class="sel-input"><option selected>Flux Schnell — Fast</option><option>Flux Dev — Quality</option></select>
+                </div>
+                <div class="select-field">
+                  <label>Parallel Workers</label>
+                  <select class="sel-input"><option>2 workers</option><option selected>4 workers</option><option>8 workers</option></select>
+                </div>
+              </div>
+              <div class="select-row">
+                <div class="select-field">
+                  <label>Subtitle Mode</label>
+                  <select class="sel-input"><option selected>Hard-coded (burned in)</option><option>Soft SRT</option><option>None</option></select>
+                </div>
+                <div class="select-field">
+                  <label>Output Format</label>
+                  <select class="sel-input"><option selected>MP4 H.264</option><option>MP4 H.265</option><option>MOV</option></select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="estimate-box">
+          <div class="est-col"><div class="est-val">~7 min</div><div class="est-lbl">Est. Time</div></div>
+          <div class="est-col credits"><div class="est-val">42</div><div class="est-lbl">Est. Credits</div></div>
+          <div class="est-col balance"><div class="est-val">320</div><div class="est-lbl">Your Balance</div></div>
+        </div>
+
+        <div class="cta-row">
+          <a href="04-scripts.html" class="btn-primary" style="font-size:15px;padding:15px 36px">
+            🚀 Start Generating Scripts
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="02-creation-flow.html" class="btn-ghost">← Back</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectRadio(opt){
+  opt.closest('.radio-group').querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('sel'));
+  opt.classList.add('sel');
+}
+function toggleAdv(){
+  document.getElementById('advContent').classList.toggle('open');
+  document.getElementById('advChev').classList.toggle('open');
+}
+function toggleProj(h){
+  h.classList.toggle('open');
+  h.querySelector('.proj-chev').classList.toggle('open');
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display=h.classList.contains('open')?'block':'none';
+}
+document.querySelectorAll('.proj-header:not(.open)').forEach(h=>{
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display='none';
+});
+</script>
+</body>
+</html>

@@ -3,935 +3,365 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>phosor.ai — Create Your Film</title>
+<title>phosor.ai — Story Input</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 :root {
-  --black: #06050a;
-  --deep: #0c0a14;
-  --surface: #110f1c;
-  --surface2: #18152a;
-  --surface3: #201c38;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --violet: #5b21b6;
-  --violet-bright: #7c3aed;
-  --amethyst: #a855f7;
-  --electric: #06b6d4;
-  --gold: #d4af6a;
-  --gold2: #f0cc8a;
-  --text: #ede9fe;
-  --text2: #c4b5fd;
-  --muted: #6b6490;
-  --muted2: #9490b0;
-  --green: #10b981;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
+  --black:#06050a; --deep:#0c0a14; --surface:#110f1c; --surface2:#18152a; --surface3:#201c38;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.12);
+  --violet:#5b21b6; --violet-bright:#7c3aed; --amethyst:#a855f7; --electric:#06b6d4;
+  --gold:#d4af6a; --gold2:#f0cc8a; --text:#ede9fe; --text2:#c4b5fd;
+  --muted:#6b6490; --muted2:#9490b0; --green:#10b981;
+  --serif:'Cormorant Garamond',Georgia,serif; --sans:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
 }
-
-html { scroll-behavior: smooth; }
-body {
-  font-family: var(--sans);
-  background: var(--black);
-  color: var(--text);
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
+html,body { height:100%; overflow:hidden; font-family:var(--sans); background:var(--black); color:var(--text); }
 body::before {
-  content: '';
-  position: fixed; inset: 0; z-index: 1000; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity: 0.35;
+  content:''; position:fixed; inset:0; z-index:1000; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.35;
 }
+@keyframes fadeSlideUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse-ring { 0%{box-shadow:0 0 0 0 rgba(168,85,247,.5)} 70%{box-shadow:0 0 0 6px rgba(168,85,247,0)} 100%{box-shadow:0 0 0 0 rgba(168,85,247,0)} }
 
-@keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 rgba(168,85,247,0.55); }
-  70%  { box-shadow: 0 0 0 8px rgba(168,85,247,0); }
-  100% { box-shadow: 0 0 0 0 rgba(168,85,247,0); }
-}
-@keyframes typewriter-cursor {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-}
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.25), inset 0 0 20px rgba(168,85,247,0.04); }
-  50%       { box-shadow: 0 0 36px rgba(168,85,247,0.45), inset 0 0 30px rgba(168,85,247,0.08); }
-}
-
-/* ── STEP NAV ── */
-.step-nav {
-  position: sticky; top: 0; z-index: 800;
-  height: 64px;
-  background: rgba(8,6,16,0.88);
-  backdrop-filter: blur(24px) saturate(180%);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 48px;
-}
-.step-nav-inner {
-  display: flex; align-items: center;
-  max-width: 900px; width: 100%;
-}
-.step-item {
-  display: flex; align-items: center; flex: 1;
-}
-.step-item:last-child { flex: 0 0 auto; }
-.step-btn {
-  display: flex; align-items: center; gap: 9px;
-  background: none; border: none; cursor: pointer;
-  padding: 6px 10px; border-radius: 8px;
-  transition: background 0.2s; white-space: nowrap;
-}
-.step-btn.pending { cursor: default; pointer-events: none; }
-.step-btn:not(.pending):hover { background: rgba(168,85,247,0.08); }
-.step-circle {
-  width: 26px; height: 26px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0;
-  transition: all 0.3s;
-}
-.step-circle.done   { background: var(--amethyst); color: #fff; }
-.step-circle.active { background: transparent; border: 2px solid var(--amethyst); color: var(--amethyst); animation: pulse-ring 2s infinite; }
-.step-circle.pending{ background: transparent; border: 2px solid rgba(255,255,255,0.13); color: var(--muted); }
-.step-label { font-size: 12px; font-weight: 500; letter-spacing: 0.2px; }
-.step-btn.done    .step-label { color: var(--text2); }
-.step-btn.active  .step-label { color: var(--amethyst); }
-.step-btn.pending .step-label { color: var(--muted); }
-.step-connector { flex: 1; height: 1px; min-width: 16px; margin: 0 4px; }
-.step-connector.done    { background: var(--amethyst); opacity: 0.6; }
-.step-connector.pending { background: repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0,rgba(255,255,255,0.1) 4px, transparent 4px, transparent 8px); }
-
-/* ── PAGE LAYOUT ── */
-.page-body {
-  padding: 52px 48px 96px;
-  max-width: 1240px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 280px;
-  column-gap: 36px;
-  row-gap: 0;
-  animation: fadeSlideUp 0.55s ease both;
-}
-
-/* Full-width row placeholders */
-.divider-row { grid-column: 1 / -1; }
-
-/* ── SECTION HEADER ── */
-.section-header { margin-bottom: 28px; }
-.section-step-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--mono); font-size: 11px; letter-spacing: 1.4px;
-  text-transform: uppercase; color: var(--amethyst);
-  margin-bottom: 12px;
-}
-.section-step-num {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--amethyst); color: #fff;
-  font-size: 10px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
-.section-title {
-  font-family: var(--serif);
-  font-size: 50px; font-weight: 600; line-height: 1.07;
-  letter-spacing: -0.5px; color: var(--text);
-  margin-bottom: 10px;
-}
-.section-subtitle { font-size: 15px; color: var(--muted2); font-weight: 400; line-height: 1.55; }
-
-/* ── CARD ── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 20px;
-}
-
-/* ── MODE SWITCHER ── */
-.mode-switcher {
-  display: inline-flex; gap: 4px;
-  background: rgba(255,255,255,0.035);
-  border: 1px solid var(--border);
-  border-radius: 10px; padding: 4px;
-  margin-bottom: 22px;
-}
-.mode-pill {
-  padding: 9px 20px; border-radius: 7px;
-  font-size: 13.5px; font-weight: 500;
-  cursor: pointer; transition: all 0.2s;
-  color: var(--muted2); border: none; background: none;
-  display: flex; align-items: center; gap: 7px;
-}
-.mode-pill.active { background: var(--amethyst); color: #fff; box-shadow: 0 0 20px rgba(168,85,247,0.3); }
-.mode-pill:not(.active):hover { color: var(--text); }
-
-/* ── TEXTAREA ── */
-.story-textarea-wrap { position: relative; margin-bottom: 18px; }
-.story-textarea {
-  width: 100%;
-  background: var(--deep);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  padding: 20px 22px 40px;
-  font-family: var(--sans); font-size: 15px; line-height: 1.7;
-  color: var(--text); resize: none; height: 140px;
-  transition: border-color 0.25s, box-shadow 0.25s; outline: none;
-}
-.story-textarea::placeholder { color: var(--muted); }
-.story-textarea:focus {
-  border-color: rgba(168,85,247,0.5);
-  box-shadow: 0 0 0 3px rgba(168,85,247,0.1), 0 0 28px rgba(168,85,247,0.08);
-}
-.char-counter {
-  position: absolute; bottom: 13px; right: 18px;
-  font-family: var(--mono); font-size: 11px; color: var(--muted);
-  pointer-events: none;
-}
-
-/* ── GENRE TAGS ── */
-.genre-row {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  align-items: center; margin-bottom: 26px;
-}
-.genre-label { font-size: 11px; color: var(--muted); font-weight: 600; margin-right: 4px; letter-spacing: 0.8px; text-transform: uppercase; font-family: var(--mono); }
-.genre-tag {
-  padding: 6px 16px; border-radius: 20px;
-  font-size: 13px; font-weight: 500;
-  border: 1px solid var(--border2);
-  background: none; color: var(--muted2);
-  cursor: pointer; transition: all 0.2s;
-}
-.genre-tag:hover { border-color: rgba(168,85,247,0.4); color: var(--text2); background: rgba(168,85,247,0.05); }
-.genre-tag.selected { border-color: var(--amethyst); color: var(--amethyst); background: rgba(168,85,247,0.1); }
-
-/* ── AI RESULT PANEL ── */
-.result-panel {
-  background: var(--deep);
-  border: 1px solid rgba(168,85,247,0.22);
-  border-radius: 14px; overflow: hidden;
-  margin-bottom: 24px;
-  animation: fadeSlideUp 0.4s ease both;
-}
-.result-panel-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.result-panel-title {
-  font-size: 12px; font-weight: 500; color: var(--muted2);
-  text-transform: uppercase; letter-spacing: 1px; font-family: var(--mono);
-  display: flex; align-items: center; gap: 8px;
-}
-.result-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,0.55); }
-.result-tabs {
-  display: flex; gap: 2px;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(255,255,255,0.018);
-  overflow-x: auto;
-}
-.result-tab {
-  padding: 6px 14px; border-radius: 6px;
-  font-size: 12.5px; font-weight: 500;
-  cursor: pointer; border: none; background: none;
-  color: var(--muted); transition: all 0.18s;
-  white-space: nowrap;
-}
-.result-tab.active { background: rgba(168,85,247,0.15); color: var(--amethyst); }
-.result-tab:not(.active):hover { color: var(--text2); background: rgba(255,255,255,0.04); }
-.result-content { padding: 22px 22px 16px; }
-.result-text { font-size: 14px; line-height: 1.78; color: var(--text2); }
-.result-text .cursor { display: inline-block; width: 2px; height: 14px; background: var(--amethyst); margin-left: 2px; vertical-align: middle; animation: typewriter-cursor 0.9s infinite; }
-.result-actions {
-  padding: 12px 18px;
-  border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-}
-.btn-regen {
-  padding: 7px 16px; border-radius: 7px; font-size: 12.5px; font-weight: 500;
-  border: 1px solid var(--border2); background: none; color: var(--muted2);
-  cursor: pointer; transition: all 0.18s;
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-regen:hover { border-color: var(--amethyst); color: var(--amethyst); background: rgba(168,85,247,0.06); }
-.btn-edit {
-  padding: 7px 16px; border-radius: 7px; font-size: 12.5px; font-weight: 500;
-  border: 1px solid rgba(6,182,212,0.28); background: rgba(6,182,212,0.05); color: var(--electric);
-  cursor: pointer; transition: all 0.18s;
-  display: flex; align-items: center; gap: 6px;
-}
-.btn-edit:hover { border-color: var(--electric); background: rgba(6,182,212,0.12); }
-
-/* ── BUTTONS ── */
-.cta-row { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
-.btn-primary {
-  padding: 14px 32px; border-radius: 10px;
-  font-size: 14.5px; font-weight: 600; letter-spacing: 0.3px;
-  background: linear-gradient(135deg, var(--violet) 0%, var(--amethyst) 100%);
-  color: #fff; border: none; cursor: pointer;
-  box-shadow: 0 0 28px rgba(168,85,247,0.32), inset 0 1px 0 rgba(255,255,255,0.1);
-  transition: all 0.22s;
-  display: flex; align-items: center; gap: 8px;
-  position: relative; overflow: hidden;
-}
-.btn-primary::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%); opacity: 0; transition: opacity 0.2s; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 44px rgba(168,85,247,0.52), inset 0 1px 0 rgba(255,255,255,0.15); }
-.btn-primary:hover::after { opacity: 1; }
-.btn-ghost {
-  padding: 13px 28px; border-radius: 10px; font-size: 14px; font-weight: 500;
-  border: 1px solid var(--border2); background: none; color: var(--muted2);
-  cursor: pointer; transition: all 0.2s;
-}
-.btn-ghost:hover { border-color: rgba(255,255,255,0.24); color: var(--text); }
-
-/* ── VISUAL DIVIDER ── */
-.visual-divider {
-  display: flex; align-items: center;
-  margin: 52px 0 56px;
-}
-.visual-divider::before, .visual-divider::after {
-  content: ''; flex: 1; height: 1px;
-}
-.visual-divider::before { background: linear-gradient(90deg, transparent, rgba(168,85,247,0.28)); }
-.visual-divider::after  { background: linear-gradient(90deg, rgba(168,85,247,0.28), transparent); }
-.visual-divider-center {
-  padding: 0 22px;
-  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted);
-  display: flex; align-items: center; gap: 10px;
-}
-.vd-diamond { color: var(--amethyst); font-size: 7px; }
-
-/* ── CONFIG ── */
-.config-note {
-  font-size: 13.5px; color: var(--muted2); margin-bottom: 24px;
-  padding: 12px 18px;
-  background: rgba(6,182,212,0.04);
-  border: 1px solid rgba(6,182,212,0.14);
-  border-radius: 8px;
-  display: flex; align-items: center; gap: 10px;
-}
-.radio-group-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.9px;
-  text-transform: uppercase; color: var(--muted2);
-  margin-bottom: 11px; font-family: var(--mono);
-}
-.radio-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-.radio-option {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 16px; border-radius: 10px;
-  border: 1px solid var(--border); cursor: pointer;
-  transition: all 0.18s; background: var(--deep);
-}
-.radio-option:hover { border-color: rgba(168,85,247,0.3); }
-.radio-option.selected { border-color: rgba(168,85,247,0.42); background: rgba(168,85,247,0.055); }
-.radio-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid var(--border2);
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; transition: border-color 0.2s;
-}
-.radio-option.selected .radio-dot { border-color: var(--amethyst); }
-.radio-dot-inner { width: 7px; height: 7px; border-radius: 50%; background: var(--amethyst); opacity: 0; transition: opacity 0.2s; }
-.radio-option.selected .radio-dot-inner { opacity: 1; }
-.radio-label { font-size: 13.5px; color: var(--text2); font-weight: 500; }
-.radio-sub { font-size: 12px; color: var(--muted); margin-left: 8px; }
-.radio-badge { margin-left: auto; font-size: 11px; font-family: var(--mono); padding: 3px 9px; border-radius: 4px; background: rgba(168,85,247,0.1); color: var(--amethyst); }
-
-.voice-select-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.voice-select-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted2); width: 88px; flex-shrink: 0; font-family: var(--mono); }
-.voice-select {
-  flex: 1;
-  background: var(--deep); border: 1px solid var(--border2); border-radius: 8px;
-  padding: 9px 32px 9px 14px; font-family: var(--sans); font-size: 13.5px;
-  color: var(--text); outline: none; cursor: pointer; transition: border-color 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6490' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
-}
-.voice-select:focus { border-color: rgba(168,85,247,0.4); }
-.voice-select option { background: var(--surface); }
-.play-btn {
-  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-  border: 1px solid rgba(6,182,212,0.28); background: rgba(6,182,212,0.06);
-  color: var(--electric); cursor: pointer; transition: all 0.18s;
-  display: flex; align-items: center; justify-content: center; font-size: 11px;
-}
-.play-btn:hover { background: rgba(6,182,212,0.14); border-color: var(--electric); }
-
-.advanced-toggle {
-  display: flex; align-items: center; gap: 9px;
-  padding: 13px 0; cursor: pointer; user-select: none;
-  border-top: 1px solid var(--border); margin-top: 8px;
-  font-size: 13px; color: var(--muted2); transition: color 0.2s;
-}
-.advanced-toggle:hover { color: var(--text2); }
-.chevron-icon { width: 14px; height: 14px; transition: transform 0.28s; margin-left: auto; }
-.chevron-icon.open { transform: rotate(180deg); }
-.advanced-content { overflow: hidden; transition: max-height 0.38s ease, opacity 0.28s; max-height: 0; opacity: 0; }
-.advanced-content.open { max-height: 700px; opacity: 1; }
-.advanced-inner { padding-top: 20px; display: flex; flex-direction: column; gap: 16px; }
-
-.config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.config-field label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted2); margin-bottom: 8px; font-family: var(--mono); }
-.config-input {
-  width: 100%; background: var(--deep); border: 1px solid var(--border2); border-radius: 8px;
-  padding: 9px 14px; font-family: var(--sans); font-size: 13.5px; color: var(--text);
-  outline: none; transition: border-color 0.2s; appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6490' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
-}
-.config-input:focus { border-color: rgba(168,85,247,0.4); }
-.config-input option { background: var(--surface); }
-.config-textarea {
-  width: 100%; background: var(--deep); border: 1px solid var(--border2); border-radius: 8px;
-  padding: 11px 14px; font-family: var(--sans); font-size: 13px; color: var(--text);
-  resize: vertical; min-height: 80px; outline: none; transition: border-color 0.2s; line-height: 1.6;
-}
-.config-textarea:focus { border-color: rgba(168,85,247,0.4); }
-
-/* ESTIMATE BOX */
-.estimate-box {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px; border-radius: 12px; overflow: hidden;
-  border: 1px solid rgba(168,85,247,0.22);
-  background: rgba(168,85,247,0.06);
-  margin-bottom: 28px;
-  animation: glow-pulse 3s ease-in-out infinite;
-}
-.estimate-col { background: var(--deep); padding: 18px 20px; text-align: center; }
-.estimate-value { font-family: var(--serif); font-size: 28px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.estimate-label { font-size: 11px; font-family: var(--mono); letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
-.estimate-col.credits .estimate-value { color: var(--amethyst); }
-.estimate-col.balance .estimate-value { color: var(--electric); }
+/* ── APP SHELL ── */
+.app-shell { display:flex; height:100vh; overflow:hidden; }
 
 /* ── SIDEBAR ── */
-.sidebar { display: flex; flex-direction: column; gap: 20px; padding-top: 90px; }
-.sidebar-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
-.sidebar-card-title { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); font-family: var(--mono); margin-bottom: 16px; }
-
-.example-card {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 12px; border-radius: 10px; border: 1px solid var(--border);
-  background: var(--deep); margin-bottom: 10px;
-  cursor: pointer; transition: all 0.18s;
+.sidebar {
+  width:240px; flex-shrink:0; background:var(--deep);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column; overflow-y:auto; overflow-x:hidden;
+  scrollbar-width:none;
 }
-.example-card:last-of-type { margin-bottom: 0; }
-.example-card:hover { border-color: rgba(168,85,247,0.3); background: rgba(168,85,247,0.03); }
-.example-emoji { width: 40px; height: 40px; border-radius: 8px; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-.example-info { flex: 1; min-width: 0; }
-.example-genre { font-size: 10px; font-family: var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 3px; }
-.example-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 6px; line-height: 1.35; }
-.example-use { font-size: 11.5px; color: var(--amethyst); display: flex; align-items: center; gap: 4px; }
+.sidebar-logo { font-family:var(--serif); font-size:18px; font-weight:600; color:var(--text); padding:20px 20px 16px; letter-spacing:0.3px; }
+.sidebar-logo em { font-style:normal; color:var(--amethyst); }
+.sidebar-sect { font-family:var(--mono); font-size:10px; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); padding:16px 20px 6px; }
+.sidebar-item {
+  display:flex; align-items:center; gap:9px; padding:8px 20px;
+  font-size:13.5px; color:var(--muted2); text-decoration:none;
+  transition:all .15s; border-left:2px solid transparent;
+}
+.sidebar-item:hover { color:var(--text); background:rgba(255,255,255,.03); }
+.sidebar-item.active { color:var(--amethyst); background:rgba(168,85,247,.06); border-left-color:var(--amethyst); }
+.sidebar-item svg { opacity:.6; flex-shrink:0; }
+.proj-header {
+  display:flex; align-items:center; gap:8px; padding:8px 20px;
+  font-size:13px; color:var(--muted2); cursor:pointer; transition:color .15s; user-select:none;
+}
+.proj-header:hover { color:var(--text2); }
+.proj-header.open { color:var(--text2); }
+.proj-chev { font-size:9px; color:var(--muted); width:10px; flex-shrink:0; transition:transform .2s; }
+.proj-chev.open { transform:rotate(90deg); }
+.proj-children { overflow:hidden; }
+.proj-sub {
+  display:flex; align-items:center; gap:8px; padding:6px 20px 6px 42px;
+  font-size:12.5px; color:var(--muted); text-decoration:none;
+  transition:all .15s; border-left:2px solid transparent;
+}
+.proj-sub:hover { color:var(--text2); }
+.proj-sub.active { color:var(--amethyst); background:rgba(168,85,247,.07); border-left-color:var(--amethyst); }
+.sidebar-bottom { margin-top:auto; padding:16px 20px; border-top:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.sidebar-avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--violet),var(--amethyst)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#fff; flex-shrink:0; }
+.sidebar-uname { font-size:13px; font-weight:500; color:var(--text2); }
+.sidebar-plan { font-size:11px; color:var(--muted); font-family:var(--mono); }
 
-.recent-project { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.recent-project:last-child { border-bottom: none; padding-bottom: 0; }
-.recent-thumb { width: 36px; height: 36px; border-radius: 6px; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-.recent-title { font-size: 13px; color: var(--text2); font-weight: 500; margin-bottom: 2px; }
-.recent-meta { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+/* ── MAIN AREA ── */
+.main-area { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+
+/* ── TOPBAR ── */
+.topbar {
+  height:52px; background:rgba(8,6,16,.94); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 32px; flex-shrink:0; z-index:100;
+}
+.topbar-bc { font-size:13px; color:var(--muted2); display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.topbar-bc-sep { color:var(--muted); }
+.topbar-bc-cur { color:var(--text2); font-weight:500; }
+.topbar-steps { margin-left:auto; display:flex; align-items:center; }
+.step-pip { display:flex; align-items:center; }
+.step-btn {
+  display:flex; align-items:center; gap:5px; padding:4px 8px; border-radius:6px;
+  background:none; border:none; cursor:default; font-family:var(--sans); font-size:12px;
+  color:var(--muted); white-space:nowrap; text-decoration:none;
+}
+.step-btn.clickable { cursor:pointer; }
+.step-btn.clickable:hover { color:var(--text2); }
+.step-num {
+  width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1); color:var(--muted); flex-shrink:0;
+}
+.step-btn.done .step-num { background:rgba(168,85,247,.18); border-color:rgba(168,85,247,.4); color:var(--amethyst); }
+.step-btn.active .step-num { background:var(--amethyst); border-color:var(--amethyst); color:#fff; animation:pulse-ring 2s infinite; }
+.step-btn.active { color:var(--amethyst); }
+.step-line { width:18px; height:1px; background:rgba(255,255,255,.07); flex-shrink:0; }
+.step-line.done { background:rgba(168,85,247,.3); }
+@media(max-width:900px){.step-btn span:not(.step-num){display:none}}
+
+/* ── CONTENT ── */
+.content-scroll { flex:1; overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:var(--surface3) transparent; }
+.content-inner { max-width:760px; margin:0 auto; padding:40px 40px 80px; animation:fadeSlideUp .45s ease both; }
+
+/* PAGE HEADER */
+.page-header { margin-bottom:32px; }
+.step-badge { display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--amethyst); margin-bottom:10px; }
+.step-badge-num { width:20px; height:20px; border-radius:50%; background:var(--amethyst); color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+.page-title { font-family:var(--serif); font-size:46px; font-weight:600; line-height:1.07; letter-spacing:-.5px; color:var(--text); margin-bottom:8px; }
+.page-sub { font-size:15px; color:var(--muted2); line-height:1.55; }
+
+/* CARD */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:28px; margin-bottom:24px; }
+
+/* MODE SWITCHER */
+.mode-sw { display:inline-flex; gap:4px; background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:22px; }
+.mode-pill { padding:8px 18px; border-radius:7px; font-size:13.5px; font-weight:500; cursor:pointer; transition:all .2s; color:var(--muted2); border:none; background:none; }
+.mode-pill.active { background:var(--amethyst); color:#fff; box-shadow:0 0 18px rgba(168,85,247,.3); }
+
+/* TEXTAREA */
+.story-wrap { position:relative; margin-bottom:18px; }
+.story-ta {
+  width:100%; background:var(--deep); border:1px solid var(--border2); border-radius:12px;
+  padding:18px 20px 36px; font-family:var(--sans); font-size:15px; line-height:1.7;
+  color:var(--text); resize:none; height:148px; transition:border-color .25s,box-shadow .25s; outline:none;
+}
+.story-ta::placeholder { color:var(--muted); }
+.story-ta:focus { border-color:rgba(168,85,247,.5); box-shadow:0 0 0 3px rgba(168,85,247,.08),0 0 24px rgba(168,85,247,.07); }
+.char-count { position:absolute; bottom:12px; right:16px; font-family:var(--mono); font-size:11px; color:var(--muted); pointer-events:none; }
+
+/* GENRE TAGS */
+.genre-row { display:flex; flex-wrap:wrap; gap:7px; align-items:center; margin-bottom:24px; }
+.genre-lbl { font-size:11px; color:var(--muted); font-weight:600; margin-right:4px; letter-spacing:.8px; text-transform:uppercase; font-family:var(--mono); }
+.genre-tag { padding:5px 14px; border-radius:20px; font-size:13px; font-weight:500; border:1px solid var(--border2); background:none; color:var(--muted2); cursor:pointer; transition:all .2s; }
+.genre-tag:hover { border-color:rgba(168,85,247,.4); color:var(--text2); }
+.genre-tag.sel { border-color:var(--amethyst); color:var(--amethyst); background:rgba(168,85,247,.1); }
+
+/* BUTTONS */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 30px; border-radius:10px; font-size:14.5px; font-weight:600; letter-spacing:.2px;
+  background:linear-gradient(135deg,var(--violet),var(--amethyst)); color:#fff; border:none; cursor:pointer;
+  box-shadow:0 0 26px rgba(168,85,247,.3),inset 0 1px 0 rgba(255,255,255,.1);
+  transition:all .22s; text-decoration:none;
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 0 40px rgba(168,85,247,.48); }
+
+/* EXAMPLE IDEAS */
+.section-label { font-family:var(--mono); font-size:11px; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+.examples-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.ex-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; cursor:pointer; transition:all .18s; }
+.ex-card:hover { border-color:rgba(168,85,247,.35); background:rgba(168,85,247,.03); transform:translateY(-1px); }
+.ex-emoji { width:38px; height:38px; border-radius:8px; background:var(--surface3); display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:10px; }
+.ex-genre { font-size:10px; font-family:var(--mono); color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px; }
+.ex-title { font-size:13px; font-weight:500; color:var(--text2); line-height:1.4; margin-bottom:8px; }
+.ex-use { font-size:11.5px; color:var(--amethyst); display:flex; align-items:center; gap:4px; }
 
 /* AMBIENT */
-.page-glow-a { position: fixed; top: 80px; left: -220px; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(91,33,182,0.11) 0%, transparent 70%); pointer-events: none; z-index: -1; }
-.page-glow-b { position: fixed; bottom: 80px; right: -120px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(6,182,212,0.055) 0%, transparent 70%); pointer-events: none; z-index: -1; }
+.glow-a { position:fixed; top:80px; left:0; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(91,33,182,.09) 0%,transparent 70%); pointer-events:none; z-index:-1; }
 </style>
 </head>
 <body>
+<div class="glow-a"></div>
 
-<div class="page-glow-a"></div>
-<div class="page-glow-b"></div>
+<div class="app-shell">
 
-<!-- STICKY STEP NAV -->
-<nav class="step-nav">
-  <div class="step-nav-inner">
-    <div class="step-item">
-      <button class="step-btn active" onclick="scrollTo2('#section-a')">
-        <div class="step-circle active">1</div>
-        <span class="step-label">Story Input</span>
-      </button>
-      <div class="step-connector pending"></div>
-    </div>
-    <div class="step-item">
-      <button class="step-btn active" onclick="scrollTo2('#section-b')">
-        <div class="step-circle active" style="animation-delay:.35s">2</div>
-        <span class="step-label">Configure</span>
-      </button>
-      <div class="step-connector pending"></div>
-    </div>
-    <div class="step-item">
-      <button class="step-btn pending">
-        <div class="step-circle pending">3</div>
-        <span class="step-label">Script &amp; Prompts</span>
-      </button>
-      <div class="step-connector pending"></div>
-    </div>
-    <div class="step-item">
-      <button class="step-btn pending">
-        <div class="step-circle pending">4</div>
-        <span class="step-label">Assets</span>
-      </button>
-      <div class="step-connector pending"></div>
-    </div>
-    <div class="step-item">
-      <button class="step-btn pending">
-        <div class="step-circle pending">5</div>
-        <span class="step-label">Video</span>
-      </button>
-      <div class="step-connector pending"></div>
-    </div>
-    <div class="step-item">
-      <button class="step-btn pending">
-        <div class="step-circle pending">6</div>
-        <span class="step-label">Merge &amp; Export</span>
-      </button>
-    </div>
-  </div>
-</nav>
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">phosor<em>.</em>ai</div>
 
-<div class="page-body">
+    <div class="sidebar-sect">Workspace</div>
+    <a href="01-homepage.html" class="sidebar-item">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Home
+    </a>
 
-  <!-- ══════════════════════════════════ -->
-  <!-- COLUMN 1 — SECTION A             -->
-  <!-- ══════════════════════════════════ -->
-  <div id="section-a">
+    <div class="sidebar-sect">Projects</div>
 
-    <div class="section-header">
-      <div class="section-step-badge">
-        <div class="section-step-num">1</div>
-        Story Input
+    <div>
+      <div class="proj-header open" onclick="toggleProj(this)">
+        <span class="proj-chev open">▶</span>
+        <span style="font-size:15px">🎬</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Echoes of Aurora</span>
       </div>
-      <h1 class="section-title">What's your story?</h1>
-      <p class="section-subtitle">One sentence or a full script — we'll handle the rest.</p>
-    </div>
-
-    <!-- Input card -->
-    <div class="card">
-      <div class="mode-switcher">
-        <button class="mode-pill active" id="pill-idea" onclick="switchMode('idea')">✦ One-sentence idea</button>
-        <button class="mode-pill" id="pill-script" onclick="switchMode('script')">📄 Full script</button>
-      </div>
-
-      <div class="story-textarea-wrap">
-        <textarea class="story-textarea" id="storyInput"
-          oninput="updateCounter()"
-          placeholder="e.g. A Tokyo street photographer discovers their subjects are all ghosts reliving their final moments...">A disgraced astronaut makes one last radio call to Earth from a dying space station, only to hear her own voice answering.</textarea>
-        <span class="char-counter" id="charCounter">128 / 2000</span>
-      </div>
-
-      <div class="genre-row">
-        <span class="genre-label">Genre</span>
-        <button class="genre-tag selected" onclick="toggleGenre(this)">Sci-Fi</button>
-        <button class="genre-tag" onclick="toggleGenre(this)">Action</button>
-        <button class="genre-tag" onclick="toggleGenre(this)">Romance</button>
-        <button class="genre-tag" onclick="toggleGenre(this)">Historical</button>
-        <button class="genre-tag" onclick="toggleGenre(this)">Thriller</button>
-        <button class="genre-tag" onclick="toggleGenre(this)">Urban Drama</button>
-      </div>
-
-      <div class="cta-row">
-        <button class="btn-primary" onclick="showResult()">
-          ✦ Expand with AI
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="btn-ghost" onclick="scrollTo2('#section-b')">Skip to Configure →</button>
+      <div class="proj-children">
+        <a href="02-creation-flow.html" class="proj-sub active">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5L8 2z" fill="currentColor" opacity=".7"/></svg>
+          Creation
+        </a>
+        <a href="08-timeline-editor.html" class="proj-sub">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="10" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><circle cx="5" cy="4" r="1.5" fill="currentColor" opacity=".6"/></svg>
+          Timeline
+        </a>
       </div>
     </div>
 
-    <!-- AI Result Panel (hidden initially) -->
-    <div class="result-panel" id="resultPanel" style="display:none">
-      <div class="result-panel-header">
-        <div class="result-panel-title">
-          <div class="result-status-dot"></div>
-          AI Expansion Complete
+    <div>
+      <div class="proj-header" onclick="toggleProj(this)">
+        <span class="proj-chev">▶</span>
+        <span style="font-size:15px">🌃</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">Neon District</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="proj-header" onclick="toggleProj(this)">
+        <span class="proj-chev">▶</span>
+        <span style="font-size:15px">🌊</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)">Deep Current</span>
+      </div>
+    </div>
+
+    <div style="height:16px"></div>
+    <a href="#" class="sidebar-item" style="margin-top:auto">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.3"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.3"/></svg>
+      New Project
+    </a>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-avatar">H</div>
+      <div>
+        <div class="sidebar-uname">Hugo</div>
+        <div class="sidebar-plan">Pro Plan</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── MAIN AREA ── -->
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-bc">
+        <span>Echoes of Aurora</span>
+        <span class="topbar-bc-sep">›</span>
+        <span class="topbar-bc-cur">Story Input</span>
+      </div>
+      <div class="topbar-steps">
+        <div class="step-pip">
+          <div class="step-btn active"><div class="step-num">1</div><span>Input</span></div>
+          <div class="step-line"></div>
         </div>
-        <span style="font-size:11.5px;color:var(--muted);font-family:var(--mono)">18 shots · 4 scenes · 5 characters</span>
+        <div class="step-pip">
+          <a href="03-configure.html" class="step-btn clickable"><div class="step-num">2</div><span>Configure</span></a>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-pip">
+          <div class="step-btn"><div class="step-num">3</div><span>Scripts</span></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-pip">
+          <div class="step-btn"><div class="step-num">4</div><span>Assets</span></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-pip">
+          <div class="step-btn"><div class="step-num">5</div><span>Video</span></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-pip">
+          <div class="step-btn"><div class="step-num">6</div><span>Merge</span></div>
+        </div>
       </div>
-      <div class="result-tabs">
-        <button class="result-tab active" onclick="switchTab(this,'outline')">Story Outline</button>
-        <button class="result-tab" onclick="switchTab(this,'script')">Full Script</button>
-        <button class="result-tab" onclick="switchTab(this,'optimized')">AI-Optimized</button>
-        <button class="result-tab" onclick="switchTab(this,'shots')">Shot Prompts Preview</button>
-      </div>
-      <div class="result-content">
-        <div id="tab-outline" class="result-text">
-          <strong style="color:var(--text);font-size:15.5px;font-family:var(--serif);font-weight:600;display:block;margin-bottom:12px">Act I — The Last Signal</strong>
-          INT. SPACE STATION AURORA — COMMS BAY — EMERGENCY LIGHTING<br>
-          Commander Elena Vasquez, 42, drifts through zero gravity amid sparking consoles. Hull panels groan. She opens a channel to Earth — the last functioning comms array.<br><br>
-          <strong style="color:var(--text);font-family:var(--serif);font-size:15px">Act II — The Echo</strong><br>
-          The channel crackles. A voice answers — her own, five years younger, confident. A message somehow returning through time's static.<br><br>
-          <strong style="color:var(--text);font-family:var(--serif);font-size:15px">Act III — Resolution</strong><br>
-          She realizes: the signal she received years ago, the one that saved her, was always going to be the one she sent now. She begins to speak.<span class="cursor"></span>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content-scroll">
+      <div class="content-inner">
+
+        <div class="page-header">
+          <div class="step-badge"><div class="step-badge-num">1</div>Story Input</div>
+          <h1 class="page-title">What's your story?</h1>
+          <p class="page-sub">One sentence or a full script — we'll handle the rest.</p>
         </div>
-        <div id="tab-script" class="result-text" style="display:none">
-          <span style="color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:1px">FADE IN:</span><br><br>
-          <span style="color:var(--amethyst)">INT. AURORA STATION — COMMS BAY — DAY</span><br><br>
-          Sparks cascade across a darkened control room. Backup power flickers amber. ELENA (42), cheekbones carved from long missions, drifts toward the one working console.<br><br>
-          <span style="text-transform:uppercase;letter-spacing:1.2px;font-family:var(--mono);font-size:11px;color:var(--muted2)">ELENA</span><br>
-          <em style="color:var(--muted)">(into headset, steady voice)</em><br>
-          "Houston. This is Aurora Station. Last transmission window. Please confirm receipt."<br><br>
-          STATIC. Fourteen seconds of it. Then—a voice.<br><br>
-          <em style="color:var(--muted)">(younger, warmer)</em><br>
-          "Elena. Don't be afraid."<span class="cursor"></span>
+
+        <div class="card">
+          <div class="mode-sw">
+            <button class="mode-pill active" id="pill-idea" onclick="switchMode('idea')">✦ One-sentence idea</button>
+            <button class="mode-pill" id="pill-script" onclick="switchMode('script')">📄 Full script</button>
+          </div>
+
+          <div class="story-wrap">
+            <textarea class="story-ta" id="storyInput" oninput="updateCounter()"
+              placeholder="e.g. A Tokyo street photographer discovers their subjects are all ghosts reliving their final moments...">A disgraced astronaut makes one last radio call to Earth from a dying space station, only to hear her own voice answering.</textarea>
+            <span class="char-count" id="charCount">128 / 2000</span>
+          </div>
+
+          <div class="genre-row">
+            <span class="genre-lbl">Genre</span>
+            <button class="genre-tag sel" onclick="toggleGenre(this)">Sci-Fi</button>
+            <button class="genre-tag" onclick="toggleGenre(this)">Action</button>
+            <button class="genre-tag" onclick="toggleGenre(this)">Romance</button>
+            <button class="genre-tag" onclick="toggleGenre(this)">Historical</button>
+            <button class="genre-tag" onclick="toggleGenre(this)">Thriller</button>
+            <button class="genre-tag" onclick="toggleGenre(this)">Urban Drama</button>
+          </div>
+
+          <a href="03-configure.html" class="btn-primary">
+            Configure
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
         </div>
-        <div id="tab-optimized" class="result-text" style="display:none">
-          Optimized for <span style="color:var(--amethyst)">18 vertical shots</span> · <span style="color:var(--electric)">Wan2.1 Standard</span> · 9:16 Portrait format<br><br>
-          <strong style="color:var(--text)">Visual Reference:</strong> Gravity (2013) × Moon (2009) × Interstellar (2014)<br>
-          <strong style="color:var(--text)">Color Palette:</strong> Deep space blacks, amber emergency glow, ice-blue Earth reflections<br>
-          <strong style="color:var(--text)">Emotional Arc:</strong> Despair → Confusion → Recognition → Peace<br><br>
-          Shot distribution: 5 establishing · 8 close-ups · 3 reaction shots · 2 abstract/symbolic<br>
-          Audio cues: 3 moments of silence, minimal score, single piano motif<span class="cursor"></span>
-        </div>
-        <div id="tab-shots" class="result-text" style="display:none">
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border)">
-              <div style="font-family:var(--mono);font-size:11px;color:var(--amethyst);margin-bottom:6px">SHOT 01 · Wide Establishing</div>
-              <p style="font-size:13px;color:var(--text2);line-height:1.6">Interior space station comms bay, emergency lighting amber and deep red, zero-gravity debris floating, cinematic lens flare from porthole, photorealistic, 8k detail</p>
-            </div>
-            <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border)">
-              <div style="font-family:var(--mono);font-size:11px;color:var(--amethyst);margin-bottom:6px">SHOT 02 · Extreme Close-Up</div>
-              <p style="font-size:13px;color:var(--text2);line-height:1.6">Extreme close-up female astronaut face, weathered but resolute, helmet visor reflecting blue Earth through porthole, volumetric amber lighting, film grain</p>
-            </div>
-            <div style="background:var(--surface2);border-radius:8px;padding:12px;border:1px solid var(--border)">
-              <div style="font-family:var(--mono);font-size:11px;color:var(--amethyst);margin-bottom:6px">SHOT 03 · POV Detail</div>
-              <p style="font-size:13px;color:var(--text2);line-height:1.6">POV astronaut hands reaching for glowing communication panel, sparks, urgency, shallow depth of field, warm backlight<span class="cursor"></span></p>
-            </div>
+
+        <!-- EXAMPLE IDEAS -->
+        <div class="section-label">Example Ideas</div>
+        <div class="examples-grid">
+          <div class="ex-card" onclick="useExample(this)">
+            <div class="ex-emoji">🌸</div>
+            <div class="ex-genre">Romance</div>
+            <div class="ex-title">Two strangers share an umbrella during Tokyo's last cherry blossom storm</div>
+            <div class="ex-use">Use this idea →</div>
+          </div>
+          <div class="ex-card" onclick="useExample(this)">
+            <div class="ex-emoji">⚔️</div>
+            <div class="ex-genre">Historical</div>
+            <div class="ex-title">A samurai's final duel is interrupted by a child asking for directions</div>
+            <div class="ex-use">Use this idea →</div>
+          </div>
+          <div class="ex-card" onclick="useExample(this)">
+            <div class="ex-emoji">🕵️</div>
+            <div class="ex-genre">Thriller</div>
+            <div class="ex-title">A detective realizes every case she's solved was planted to keep her occupied</div>
+            <div class="ex-use">Use this idea →</div>
           </div>
         </div>
-      </div>
-      <div class="result-actions">
-        <button class="btn-regen">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M1 8a7 7 0 0 1 13.5-2.7M15 8a7 7 0 0 1-13.5 2.7M1 5.3V2m0 3.3h3.3M15 10.7V14m0-3.3h-3.3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Regenerate
-        </button>
-        <button class="btn-edit">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3L11 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Edit
-        </button>
-        <span style="margin-left:auto;font-size:11.5px;color:var(--muted);font-family:var(--mono)">4,218 tokens</span>
-      </div>
-    </div>
 
-  </div><!-- /section-a col -->
-
-  <!-- SIDEBAR — Section A -->
-  <div class="sidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">Example ideas</div>
-
-      <div class="example-card">
-        <div class="example-emoji">🌸</div>
-        <div class="example-info">
-          <div class="example-genre">Romance</div>
-          <div class="example-title">Two strangers share an umbrella during Tokyo's last cherry blossom storm</div>
-          <div class="example-use">Use this idea →</div>
-        </div>
-      </div>
-      <div class="example-card">
-        <div class="example-emoji">⚔️</div>
-        <div class="example-info">
-          <div class="example-genre">Historical</div>
-          <div class="example-title">A samurai's final duel is interrupted by a child asking for directions</div>
-          <div class="example-use">Use this idea →</div>
-        </div>
-      </div>
-      <div class="example-card">
-        <div class="example-emoji">🕵️</div>
-        <div class="example-info">
-          <div class="example-genre">Thriller</div>
-          <div class="example-title">A detective realizes every case she's solved was planted to keep her occupied</div>
-          <div class="example-use">Use this idea →</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">Recent projects</div>
-      <div class="recent-project">
-        <div class="recent-thumb">🏙️</div>
-        <div>
-          <div class="recent-title">Neon District</div>
-          <div class="recent-meta">Urban Drama · 2 days ago</div>
-        </div>
-      </div>
-      <div class="recent-project">
-        <div class="recent-thumb">🌊</div>
-        <div>
-          <div class="recent-title">Deep Current</div>
-          <div class="recent-meta">Thriller · 5 days ago</div>
-        </div>
-      </div>
-      <div class="recent-project">
-        <div class="recent-thumb">🏔️</div>
-        <div>
-          <div class="recent-title">Summit Protocol</div>
-          <div class="recent-meta">Action · 1 week ago</div>
-        </div>
       </div>
     </div>
   </div>
-
-  <!-- VISUAL DIVIDER (full-width) -->
-  <div class="divider-row">
-    <div class="visual-divider">
-      <div class="visual-divider-center">
-        <span class="vd-diamond">◆</span>
-        Step 2
-        <span class="vd-diamond">◆</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════ -->
-  <!-- COLUMN 1 — SECTION B             -->
-  <!-- ══════════════════════════════════ -->
-  <div id="section-b">
-
-    <div class="section-header">
-      <div class="section-step-badge">
-        <div class="section-step-num">2</div>
-        Configure
-      </div>
-      <h2 class="section-title">Configure your film</h2>
-      <p class="section-subtitle">Defaults are optimized — skip straight to Generate if unsure.</p>
-    </div>
-
-    <div class="config-note">
-      <span style="font-size:16px">💡</span>
-      Most users get great results without changing anything. The defaults are tuned for cinematic quality on vertical format.
-    </div>
-
-    <div class="card">
-      <p class="radio-group-label">Resolution</p>
-      <div class="radio-group" id="resGroup">
-        <label class="radio-option selected" onclick="selectRadio(this)">
-          <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-          <span class="radio-label">1080 × 1920</span>
-          <span class="radio-sub">Vertical · TikTok / Reels</span>
-          <span class="radio-badge">Recommended</span>
-        </label>
-        <label class="radio-option" onclick="selectRadio(this)">
-          <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-          <span class="radio-label">1920 × 1080</span>
-          <span class="radio-sub">Landscape · YouTube / Desktop</span>
-        </label>
-        <label class="radio-option" onclick="selectRadio(this)">
-          <div class="radio-dot"><div class="radio-dot-inner"></div></div>
-          <span class="radio-label">1080 × 1080</span>
-          <span class="radio-sub">Square · Instagram Feed</span>
-        </label>
-      </div>
-
-      <div class="voice-select-row">
-        <span class="voice-select-label">Narrator</span>
-        <select class="voice-select">
-          <option>Aria — Warm, cinematic (Female)</option>
-          <option>Marcus — Deep, authoritative (Male)</option>
-          <option>Nova — Ethereal, mysterious (Female)</option>
-          <option>Caden — Youthful, energetic (Male)</option>
-        </select>
-        <button class="play-btn" title="Preview voice">▶</button>
-      </div>
-      <div class="voice-select-row">
-        <span class="voice-select-label">Character</span>
-        <select class="voice-select">
-          <option>Auto-assign by role</option>
-          <option>Aria — Warm (Female)</option>
-          <option>Marcus — Deep (Male)</option>
-          <option>Nova — Ethereal (Female)</option>
-        </select>
-        <button class="play-btn" title="Preview voice">▶</button>
-      </div>
-
-      <div class="advanced-toggle" onclick="toggleAdvanced()">
-        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="6" stroke="var(--muted2)" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="var(--muted2)" stroke-width="1.4" stroke-linecap="round"/></svg>
-        Advanced settings
-        <svg class="chevron-icon" id="chevron" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-
-      <div class="advanced-content" id="advContent">
-        <div class="advanced-inner">
-          <div class="config-row">
-            <div class="config-field">
-              <label>Frame Rate</label>
-              <select class="config-input">
-                <option selected>24 fps — Cinematic</option>
-                <option>30 fps — Standard</option>
-                <option>60 fps — Smooth</option>
-              </select>
-            </div>
-            <div class="config-field">
-              <label>Max Shot Duration</label>
-              <select class="config-input">
-                <option>5 seconds</option>
-                <option selected>8 seconds</option>
-                <option>12 seconds</option>
-              </select>
-            </div>
-          </div>
-          <div class="config-field">
-            <label>Video Generation Model</label>
-            <select class="config-input" style="padding-right:32px">
-              <option selected>Wan2.1 Standard — Fast, 42 credits</option>
-              <option>Wan2.1 Pro — High Quality, 70 credits</option>
-              <option>Kling 1.6 — Experimental, 55 credits</option>
-            </select>
-          </div>
-          <div class="config-field">
-            <label>Global Style Prompt</label>
-            <textarea class="config-textarea">Cinematic, shallow depth of field, high contrast, film grain, color graded in teal and orange, anamorphic lens flare, professional lighting</textarea>
-          </div>
-          <div class="config-field">
-            <label>Global Negative Prompt</label>
-            <textarea class="config-textarea">blurry, low quality, watermark, text overlay, distorted faces, cartoon, anime, amateur</textarea>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="estimate-box">
-      <div class="estimate-col">
-        <div class="estimate-value">~7 min</div>
-        <div class="estimate-label">Est. Time</div>
-      </div>
-      <div class="estimate-col credits">
-        <div class="estimate-value">42</div>
-        <div class="estimate-label">Est. Credits</div>
-      </div>
-      <div class="estimate-col balance">
-        <div class="estimate-value">320</div>
-        <div class="estimate-label">Your Balance</div>
-      </div>
-    </div>
-
-    <div class="cta-row">
-      <button class="btn-primary" style="font-size:15px;padding:15px 40px">
-        🚀 Start Generating
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-
-  </div><!-- /section-b col -->
-
-  <!-- SIDEBAR — Section B -->
-  <div class="sidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">Model comparison</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="padding:12px;background:rgba(168,85,247,0.055);border:1px solid rgba(168,85,247,0.18);border-radius:9px">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">Wan2.1 Standard</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5">Best speed/quality ratio. Ideal for most projects and final delivery.</div>
-          <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--amethyst)">42 credits · ~7 min</div>
-        </div>
-        <div style="padding:12px;background:var(--deep);border:1px solid var(--border);border-radius:9px">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">Wan2.1 Pro</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5">Higher fidelity motion and detail. Best for polished final cuts.</div>
-          <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--electric)">70 credits · ~14 min</div>
-        </div>
-        <div style="padding:12px;background:var(--deep);border:1px solid var(--border);border-radius:9px">
-          <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:4px">Kling 1.6</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.5">Experimental. Unique motion style, occasional artifacts.</div>
-          <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--gold)">55 credits · ~10 min</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sidebar-card">
-      <div class="sidebar-card-title">Quick tips</div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <span style="color:var(--amethyst);font-size:14px;flex-shrink:0;margin-top:2px">✦</span>
-          <span style="font-size:13px;color:var(--muted2);line-height:1.5">Vertical 9:16 format gets 3× more engagement on social.</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <span style="color:var(--electric);font-size:14px;flex-shrink:0;margin-top:2px">◈</span>
-          <span style="font-size:13px;color:var(--muted2);line-height:1.5">Aria voice pairs beautifully with cinematic and dramatic stories.</span>
-        </div>
-        <div style="display:flex;gap:10px;align-items:flex-start">
-          <span style="color:var(--gold);font-size:14px;flex-shrink:0;margin-top:2px">◆</span>
-          <span style="font-size:13px;color:var(--muted2);line-height:1.5">Individual shots can be regenerated after the initial run.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /page-body -->
+</div>
 
 <script>
-function updateCounter() {
-  const ta = document.getElementById('storyInput');
-  const el = document.getElementById('charCounter');
-  if (ta && el) el.textContent = ta.value.length + ' / 2000';
+function updateCounter(){
+  const ta=document.getElementById('storyInput'),el=document.getElementById('charCount');
+  if(ta&&el) el.textContent=ta.value.length+' / 2000';
 }
 updateCounter();
-
-function switchMode(mode) {
-  const ta = document.getElementById('storyInput');
-  document.getElementById('pill-idea').classList.toggle('active', mode === 'idea');
-  document.getElementById('pill-script').classList.toggle('active', mode === 'script');
-  if (mode === 'script') {
-    ta.style.height = '260px';
-    ta.placeholder = 'Paste your full script here. Supported formats: plain text, Final Draft, Fountain...';
-  } else {
-    ta.style.height = '140px';
-    ta.placeholder = 'e.g. A Tokyo street photographer discovers their subjects are all ghosts reliving their final moments...';
+function switchMode(m){
+  const ta=document.getElementById('storyInput');
+  document.getElementById('pill-idea').classList.toggle('active',m==='idea');
+  document.getElementById('pill-script').classList.toggle('active',m==='script');
+  ta.style.height=m==='script'?'240px':'148px';
+  ta.placeholder=m==='script'?'Paste your full script here...':'e.g. A Tokyo street photographer discovers their subjects are all ghosts...';
+}
+function toggleGenre(b){b.classList.toggle('sel');}
+function toggleProj(hdr){
+  hdr.classList.toggle('open');
+  hdr.querySelector('.proj-chev').classList.toggle('open');
+  const children=hdr.nextElementSibling;
+  if(children&&children.classList.contains('proj-children')){
+    children.style.display=hdr.classList.contains('open')?'block':'none';
   }
 }
-
-function showResult() {
-  const panel = document.getElementById('resultPanel');
-  if (panel) {
-    panel.style.display = 'block';
-    setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
-  }
+function useExample(card){
+  const title=card.querySelector('.ex-title').textContent;
+  document.getElementById('storyInput').value=title;
+  updateCounter();
 }
-
-function switchTab(btn, tab) {
-  document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  ['outline','script','optimized','shots'].forEach(id => {
-    const el = document.getElementById('tab-' + id);
-    if (el) el.style.display = (id === tab) ? 'block' : 'none';
-  });
-}
-
-function toggleGenre(btn) { btn.classList.toggle('selected'); }
-
-function selectRadio(opt) {
-  opt.closest('.radio-group').querySelectorAll('.radio-option').forEach(o => o.classList.remove('selected'));
-  opt.classList.add('selected');
-}
-
-function toggleAdvanced() {
-  document.getElementById('advContent').classList.toggle('open');
-  document.getElementById('chevron').classList.toggle('open');
-}
-
-function scrollTo2(sel) {
-  const el = document.querySelector(sel);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+// Init collapsed projects
+document.querySelectorAll('.proj-header:not(.open)').forEach(h=>{
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display='none';
+});
 </script>
-
-<style>
-.wf-nav{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:6px;background:rgba(13,13,13,0.92);border:1px solid #2e2e4a;border-radius:40px;padding:8px 12px;backdrop-filter:blur(12px);z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,0.5);}
-.wf-nav a{padding:6px 14px;border-radius:20px;font-size:12px;font-family:'DM Sans',sans-serif;color:#888;text-decoration:none;white-space:nowrap;transition:all 0.2s;}
-.wf-nav a:hover{color:#fff;background:rgba(255,255,255,0.08);}
-.wf-nav a.wf-active{background:#7c3aed;color:#fff;}
-</style>
-<nav class="wf-nav">
-  <a href="01-homepage.html">① Homepage</a>
-  <a href="02-creation-flow.html" class="wf-active">② Creation</a>
-  <a href="03-generation-progress.html">③ Generation</a>
-  <a href="04-timeline-editor.html">④ Timeline</a>
-</nav>
-
 </body>
 </html>

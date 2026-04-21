@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>phosor.ai — Merge & Export</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#06050a;--deep:#0c0a14;--surface:#110f1c;--surface2:#18152a;--surface3:#201c38;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --violet:#5b21b6;--amethyst:#a855f7;--electric:#06b6d4;
+  --text:#ede9fe;--text2:#c4b5fd;--muted:#6b6490;--muted2:#9490b0;--green:#10b981;
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--black);color:var(--text)}
+body::before{content:'';position:fixed;inset:0;z-index:1000;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(168,85,247,.5)}70%{box-shadow:0 0 0 6px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 20px rgba(168,85,247,.18)}50%{box-shadow:0 0 40px rgba(168,85,247,.38)}}
+
+.app-shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--deep);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sidebar-logo{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--text);padding:20px 20px 16px}
+.sidebar-logo em{font-style:normal;color:var(--amethyst)}
+.sidebar-sect{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:16px 20px 6px}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 20px;font-size:13.5px;color:var(--muted2);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.proj-header{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:var(--muted2);cursor:pointer;user-select:none}
+.proj-chev{font-size:9px;color:var(--muted);width:10px;flex-shrink:0;transition:transform .2s}
+.proj-chev.open{transform:rotate(90deg)}
+.proj-sub{display:flex;align-items:center;gap:8px;padding:6px 20px 6px 42px;font-size:12.5px;color:var(--muted);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.proj-sub:hover{color:var(--text2)}
+.proj-sub.active{color:var(--amethyst);background:rgba(168,85,247,.07);border-left-color:var(--amethyst)}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--amethyst));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;background:rgba(8,6,16,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;flex-shrink:0;z-index:100}
+.topbar-bc{font-size:13px;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-bc-cur{color:var(--text2);font-weight:500}
+.topbar-steps{margin-left:auto;display:flex;align-items:center}
+.step-pip{display:flex;align-items:center}
+.step-btn{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:6px;background:none;border:none;cursor:default;font-family:var(--sans);font-size:12px;color:var(--muted);white-space:nowrap;text-decoration:none}
+.step-btn.clickable{cursor:pointer}
+.step-btn.clickable:hover{color:var(--text2)}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);flex-shrink:0}
+.step-btn.done .step-num{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.4);color:var(--amethyst)}
+.step-btn.active .step-num{background:var(--amethyst);border-color:var(--amethyst);color:#fff;animation:pulse-ring 2s infinite}
+.step-btn.active{color:var(--amethyst)}
+.step-line{width:18px;height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+.step-line.done{background:rgba(168,85,247,.3)}
+
+.content-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+.content-inner{max-width:760px;margin:0 auto;padding:36px 40px 80px;animation:fadeSlideUp .45s ease both}
+
+.page-header{margin-bottom:24px}
+.step-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--amethyst);margin-bottom:10px}
+.step-badge-num{width:20px;height:20px;border-radius:50%;background:var(--amethyst);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.page-title{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.07;letter-spacing:-.5px;color:var(--text);margin-bottom:6px}
+
+/* SUCCESS BANNER */
+.success-banner{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:12px;margin-bottom:24px}
+.success-icon{font-size:22px;flex-shrink:0}
+.success-text{font-size:14px;color:var(--text2);line-height:1.5}
+.success-text strong{color:var(--green)}
+
+/* SHOT STRIP */
+.shot-strip-wrap{margin-bottom:28px}
+.shot-strip-label{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.shot-strip{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+.shot-thumb{flex-shrink:0;width:44px;height:72px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:all .15s;position:relative}
+.shot-thumb:hover{border-color:rgba(168,85,247,.4);transform:scaleY(1.05)}
+.shot-thumb.active{border-color:var(--amethyst);background:rgba(168,85,247,.1)}
+.shot-thumb-emoji{font-size:16px}
+.shot-thumb-num{font-family:var(--mono);font-size:8px;color:var(--muted)}
+.shot-thumb-status{position:absolute;top:2px;right:2px;width:6px;height:6px;border-radius:50%}
+.shot-thumb-status.done{background:var(--green)}
+.shot-thumb-status.gen{background:var(--electric)}
+.shot-thumb-status.fail{background:#ef4444}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.card-title{font-size:13.5px;font-weight:600;color:var(--text2);margin-bottom:16px}
+
+/* RADIO */
+.radio-group{display:flex;flex-direction:column;gap:7px;margin-bottom:20px}
+.radio-opt{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:9px;border:1px solid var(--border);cursor:pointer;transition:all .18s;background:var(--deep)}
+.radio-opt:hover{border-color:rgba(168,85,247,.3)}
+.radio-opt.sel{border-color:rgba(168,85,247,.42);background:rgba(168,85,247,.055)}
+.radio-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s}
+.radio-opt.sel .radio-dot{border-color:var(--amethyst)}
+.radio-dot-inner{width:7px;height:7px;border-radius:50%;background:var(--amethyst);opacity:0;transition:opacity .2s}
+.radio-opt.sel .radio-dot-inner{opacity:1}
+.radio-lbl{font-size:13.5px;color:var(--text2);font-weight:500}
+.radio-sub{font-size:12px;color:var(--muted);margin-left:6px}
+
+/* CONFIG ROW */
+.config-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.config-field label{display:block;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted2);margin-bottom:6px;font-family:var(--mono)}
+.config-val{padding:9px 14px;background:var(--deep);border:1px solid var(--border2);border-radius:8px;font-size:13.5px;color:var(--muted2)}
+.sel-input{width:100%;background:var(--deep);border:1px solid var(--border2);border-radius:8px;padding:9px 32px 9px 14px;font-family:var(--sans);font-size:13.5px;color:var(--text);outline:none;cursor:pointer;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6490' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.sel-input:focus{border-color:rgba(168,85,247,.4)}
+.sel-input option{background:var(--surface)}
+
+/* ESTIMATE */
+.estimate-row{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:10px;margin-bottom:20px}
+.est-icon{font-size:16px}
+.est-text{font-size:13.5px;color:var(--muted2)}
+.est-text strong{color:var(--text2)}
+
+/* CTA */
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:600;background:linear-gradient(135deg,var(--violet),var(--amethyst));color:#fff;border:none;cursor:pointer;box-shadow:0 0 26px rgba(168,85,247,.3),inset 0 1px 0 rgba(255,255,255,.1);transition:all .22s;text-decoration:none;animation:glow-pulse 3s ease-in-out infinite}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 44px rgba(168,85,247,.5)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:10px;font-size:14.5px;font-weight:500;border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer;transition:all .2s;text-decoration:none}
+.btn-ghost:hover{border-color:rgba(255,255,255,.24);color:var(--text)}
+.cta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+.timeline-link{display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:13.5px;color:var(--amethyst);text-decoration:none;transition:opacity .15s}
+.timeline-link:hover{opacity:.75}
+
+.divider{height:1px;background:var(--border);margin:24px 0}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">phosor<em>.</em>ai</div>
+    <div class="sidebar-sect">Workspace</div>
+    <a href="01-homepage.html" class="sidebar-item">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Home
+    </a>
+    <div class="sidebar-sect">Projects</div>
+    <div>
+      <div class="proj-header open" onclick="toggleProj(this)">
+        <span class="proj-chev open">▶</span><span style="font-size:15px">🎬</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Echoes of Aurora</span>
+      </div>
+      <div class="proj-children">
+        <a href="02-creation-flow.html" class="proj-sub active">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5L8 2z" fill="currentColor" opacity=".7"/></svg>Creation
+        </a>
+        <a href="08-timeline-editor.html" class="proj-sub">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="10" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Timeline
+        </a>
+      </div>
+    </div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌃</span><span style="flex:1;color:var(--muted)">Neon District</span></div></div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌊</span><span style="flex:1;color:var(--muted)">Deep Current</span></div></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-avatar">H</div>
+      <div><div style="font-size:13px;font-weight:500;color:var(--text2)">Hugo</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Pro Plan</div></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-bc">
+        <span>Echoes of Aurora</span><span style="color:var(--muted)">›</span>
+        <span class="topbar-bc-cur">Merge &amp; Export</span>
+      </div>
+      <div class="topbar-steps">
+        <div class="step-pip"><a href="02-creation-flow.html" class="step-btn clickable done"><div class="step-num">1</div><span>Input</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><a href="03-configure.html" class="step-btn clickable done"><div class="step-num">2</div><span>Configure</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><a href="04-scripts.html" class="step-btn clickable done"><div class="step-num">3</div><span>Scripts</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><a href="05-assets.html" class="step-btn clickable done"><div class="step-num">4</div><span>Assets</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><a href="06-video.html" class="step-btn clickable done"><div class="step-num">5</div><span>Video</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><div class="step-btn active"><div class="step-num">6</div><span>Merge</span></div></div>
+      </div>
+    </div>
+
+    <div class="content-scroll">
+      <div class="content-inner">
+
+        <div class="page-header">
+          <div class="step-badge"><div class="step-badge-num">6</div>Merge &amp; Export</div>
+          <h1 class="page-title">Merge &amp; Export</h1>
+        </div>
+
+        <!-- SUCCESS BANNER -->
+        <div class="success-banner">
+          <div class="success-icon">🎬</div>
+          <div class="success-text">
+            <strong>17 / 18 shots ready</strong> — 1 failed shot excluded. Estimated final duration: <strong>2 min 14 sec</strong>. Ready to merge and export.
+          </div>
+        </div>
+
+        <!-- SHOT STRIP -->
+        <div class="shot-strip-wrap">
+          <div class="shot-strip-label">Shot Preview Strip</div>
+          <div class="shot-strip">
+            <div class="shot-thumb active"><div class="shot-thumb-emoji">🌌</div><div class="shot-thumb-num">01</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">👩‍🚀</div><div class="shot-thumb-num">02</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🛰️</div><div class="shot-thumb-num">03</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">⚡</div><div class="shot-thumb-num">04</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🎙️</div><div class="shot-thumb-num">05</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb" style="border-color:rgba(239,68,68,.3)"><div class="shot-thumb-emoji" style="opacity:.3">🌍</div><div class="shot-thumb-num" style="color:#ef4444">06</div><div class="shot-thumb-status fail"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">💫</div><div class="shot-thumb-num">07</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🛰️</div><div class="shot-thumb-num">08</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">👩‍🚀</div><div class="shot-thumb-num">09</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🌙</div><div class="shot-thumb-num">10</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">✨</div><div class="shot-thumb-num">11</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🔭</div><div class="shot-thumb-num">12</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🌌</div><div class="shot-thumb-num">13</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">👩‍🚀</div><div class="shot-thumb-num">14</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">⚡</div><div class="shot-thumb-num">15</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🌍</div><div class="shot-thumb-num">16</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">💫</div><div class="shot-thumb-num">17</div><div class="shot-thumb-status done"></div></div>
+            <div class="shot-thumb"><div class="shot-thumb-emoji">🌅</div><div class="shot-thumb-num">18</div><div class="shot-thumb-status done"></div></div>
+          </div>
+        </div>
+
+        <!-- EXPORT OPTIONS -->
+        <div class="card">
+          <div class="card-title">Export Options</div>
+
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--muted2);margin-bottom:9px">Output Format</div>
+          <div class="radio-group" id="fmtGroup">
+            <label class="radio-opt sel" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">MP4 H.264</span>
+              <span class="radio-sub">Universal · ~85 MB · Best compatibility</span>
+            </label>
+            <label class="radio-opt" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">MP4 H.265</span>
+              <span class="radio-sub">Compressed · ~50 MB · Storage optimized</span>
+            </label>
+            <label class="radio-opt" onclick="selectRadio(this)">
+              <div class="radio-dot"><div class="radio-dot-inner"></div></div>
+              <span class="radio-lbl">MOV</span>
+              <span class="radio-sub">Professional · ~130 MB · Final Cut Pro</span>
+            </label>
+          </div>
+
+          <div class="config-row">
+            <div class="config-field">
+              <label>Resolution</label>
+              <div class="config-val" style="color:var(--muted);display:flex;align-items:center;gap:6px">
+                720 × 1280
+                <span style="font-size:11px;font-family:var(--mono);color:var(--muted);background:rgba(255,255,255,.04);padding:2px 6px;border-radius:3px">Locked</span>
+              </div>
+            </div>
+            <div class="config-field">
+              <label>Subtitle Mode</label>
+              <select class="sel-input">
+                <option selected>Hard-coded (burned in)</option>
+                <option>Soft SRT file</option>
+                <option>None</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="config-row" style="margin-bottom:0">
+            <div class="config-field">
+              <label>Subtitle Style</label>
+              <select class="sel-input">
+                <option selected>White · Black border</option>
+                <option>Yellow · No border</option>
+                <option>Custom</option>
+              </select>
+            </div>
+            <div class="config-field">
+              <label>Font Size</label>
+              <select class="sel-input">
+                <option>Small (28px)</option>
+                <option selected>Medium (36px)</option>
+                <option>Large (48px)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESTIMATE -->
+        <div class="estimate-row">
+          <div class="est-icon">📦</div>
+          <div class="est-text">
+            Estimated file size: <strong>~85 MB</strong> · Duration: <strong>2:14</strong> · 17 shots · 720×1280 · 24fps
+          </div>
+        </div>
+
+        <!-- DOWNLOAD BUTTONS -->
+        <div class="cta-row">
+          <a href="#" class="btn-primary" onclick="simulateDownload(event)">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 7l4 4 4-4M2 13h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download Final Video
+          </a>
+          <a href="#" class="btn-ghost">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            Download Asset Pack
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <a href="08-timeline-editor.html" class="timeline-link">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="5" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="10" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><circle cx="4.5" cy="3" r="1.5" fill="currentColor" opacity=".6"/></svg>
+          Open in Timeline Editor →
+        </a>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectRadio(opt){
+  opt.closest('.radio-group').querySelectorAll('.radio-opt').forEach(o=>o.classList.remove('sel'));
+  opt.classList.add('sel');
+}
+function simulateDownload(e){
+  e.preventDefault();
+  const btn=e.currentTarget;
+  const orig=btn.innerHTML;
+  btn.innerHTML='<svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="animation:spin 1s linear infinite"><path d="M1 8a7 7 0 0 1 13.5-2.7M15 8a7 7 0 0 1-13.5 2.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Preparing...';
+  setTimeout(()=>btn.innerHTML=orig,2000);
+}
+function toggleProj(h){
+  h.classList.toggle('open');
+  h.querySelector('.proj-chev').classList.toggle('open');
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display=h.classList.contains('open')?'block':'none';
+}
+document.querySelectorAll('.proj-header:not(.open)').forEach(h=>{
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display='none';
+});
+</script>
+</body>
+</html>

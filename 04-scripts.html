@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>phosor.ai — Scripts & Prompts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#06050a;--deep:#0c0a14;--surface:#110f1c;--surface2:#18152a;--surface3:#201c38;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --violet:#5b21b6;--amethyst:#a855f7;--electric:#06b6d4;
+  --text:#ede9fe;--text2:#c4b5fd;--muted:#6b6490;--muted2:#9490b0;--green:#10b981;
+  --serif:'Cormorant Garamond',Georgia,serif;--sans:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--black);color:var(--text)}
+body::before{content:'';position:fixed;inset:0;z-index:1000;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");opacity:.35}
+@keyframes fadeSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(168,85,247,.5)}70%{box-shadow:0 0 0 6px rgba(168,85,247,0)}100%{box-shadow:0 0 0 0 rgba(168,85,247,0)}}
+
+.app-shell{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;flex-shrink:0;background:var(--deep);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sidebar-logo{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--text);padding:20px 20px 16px}
+.sidebar-logo em{font-style:normal;color:var(--amethyst)}
+.sidebar-sect{font-family:var(--mono);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);padding:16px 20px 6px}
+.sidebar-item{display:flex;align-items:center;gap:9px;padding:8px 20px;font-size:13.5px;color:var(--muted2);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.sidebar-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.proj-header{display:flex;align-items:center;gap:8px;padding:8px 20px;font-size:13px;color:var(--muted2);cursor:pointer;user-select:none}
+.proj-chev{font-size:9px;color:var(--muted);width:10px;flex-shrink:0;transition:transform .2s}
+.proj-chev.open{transform:rotate(90deg)}
+.proj-sub{display:flex;align-items:center;gap:8px;padding:6px 20px 6px 42px;font-size:12.5px;color:var(--muted);text-decoration:none;transition:all .15s;border-left:2px solid transparent}
+.proj-sub:hover{color:var(--text2)}
+.proj-sub.active{color:var(--amethyst);background:rgba(168,85,247,.07);border-left-color:var(--amethyst)}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--amethyst));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;background:rgba(8,6,16,.94);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 32px;flex-shrink:0;z-index:100}
+.topbar-bc{font-size:13px;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-bc-cur{color:var(--text2);font-weight:500}
+.topbar-steps{margin-left:auto;display:flex;align-items:center}
+.step-pip{display:flex;align-items:center}
+.step-btn{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:6px;background:none;border:none;cursor:default;font-family:var(--sans);font-size:12px;color:var(--muted);white-space:nowrap;text-decoration:none}
+.step-btn.clickable{cursor:pointer}
+.step-btn.clickable:hover{color:var(--text2)}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted);flex-shrink:0}
+.step-btn.done .step-num{background:rgba(168,85,247,.18);border-color:rgba(168,85,247,.4);color:var(--amethyst)}
+.step-btn.active .step-num{background:var(--amethyst);border-color:var(--amethyst);color:#fff;animation:pulse-ring 2s infinite}
+.step-btn.active{color:var(--amethyst)}
+.step-line{width:18px;height:1px;background:rgba(255,255,255,.07);flex-shrink:0}
+.step-line.done{background:rgba(168,85,247,.3)}
+
+.content-scroll{flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+.content-inner{max-width:760px;margin:0 auto;padding:36px 40px 80px;animation:fadeSlideUp .45s ease both}
+
+.page-header{margin-bottom:28px}
+.step-badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--amethyst);margin-bottom:10px}
+.step-badge-num{width:20px;height:20px;border-radius:50%;background:var(--amethyst);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.page-title{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.07;letter-spacing:-.5px;color:var(--text);margin-bottom:6px}
+
+/* STATS ROW */
+.stats-row{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
+.stat-pill{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:24px}
+.stat-num{font-family:var(--serif);font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.stat-lbl{font-size:12px;color:var(--muted2);font-family:var(--mono)}
+.stat-pill.green{border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.04)}
+.stat-pill.green .stat-num{color:var(--green)}
+
+/* ACCORDION */
+.accordion{display:flex;flex-direction:column;gap:10px;margin-bottom:32px}
+.acc-item{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.acc-item:has(.acc-content.open){border-color:rgba(168,85,247,.25)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none;transition:background .15s}
+.acc-header:hover{background:rgba(255,255,255,.02)}
+.acc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.acc-title{font-size:14.5px;font-weight:600;color:var(--text2)}
+.acc-count{font-family:var(--mono);font-size:11px;color:var(--muted);background:rgba(255,255,255,.05);padding:2px 8px;border-radius:4px;margin-left:6px}
+.acc-status{margin-left:auto;font-size:12px;color:var(--green);display:flex;align-items:center;gap:5px;flex-shrink:0}
+.acc-chev{width:16px;height:16px;color:var(--muted);transition:transform .25s;flex-shrink:0;margin-left:8px}
+.acc-chev.open{transform:rotate(180deg)}
+.acc-content{max-height:0;overflow:hidden;transition:max-height .38s ease,opacity .28s;opacity:0}
+.acc-content.open{max-height:2000px;opacity:1}
+.acc-body{padding:0 20px 20px;border-top:1px solid var(--border)}
+
+/* SCRIPT BODY */
+.script-text-area{width:100%;background:var(--deep);border:1px solid var(--border2);border-radius:10px;padding:16px;font-family:var(--sans);font-size:13.5px;color:var(--text2);resize:vertical;min-height:180px;outline:none;line-height:1.75;transition:border-color .2s;margin-top:16px}
+.script-text-area:focus{border-color:rgba(168,85,247,.4)}
+
+/* SHOTS TABLE */
+.shots-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.shots-table th{font-family:var(--mono);font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border2)}
+.shots-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.shots-table tr:last-child td{border-bottom:none}
+.shots-table tr:hover td{background:rgba(255,255,255,.02)}
+.shot-num{font-family:var(--mono);font-size:12px;color:var(--amethyst);font-weight:500}
+.shot-edit-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:11px;transition:color .15s}
+.shot-edit-btn:hover{color:var(--electric)}
+
+/* AI-SHOTS BODY */
+.ai-shots-grid{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.ai-shot-card{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:14px}
+.ai-shot-label{font-family:var(--mono);font-size:11px;color:var(--amethyst);margin-bottom:6px;letter-spacing:.5px}
+.ai-shot-text{font-size:13px;color:var(--muted2);line-height:1.6}
+
+/* PROMPTS BODY */
+.prompts-list{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.prompt-item{background:var(--deep);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.prompt-item-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.prompt-shot-lbl{font-family:var(--mono);font-size:11px;color:var(--amethyst)}
+.prompt-inline{width:100%;background:transparent;border:none;font-family:var(--mono);font-size:12px;color:var(--muted2);resize:none;outline:none;line-height:1.55;transition:color .15s}
+.prompt-inline:focus{color:var(--text2)}
+
+/* CTA */
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 36px;border-radius:10px;font-size:15px;font-weight:600;background:linear-gradient(135deg,var(--violet),var(--amethyst));color:#fff;border:none;cursor:pointer;box-shadow:0 0 26px rgba(168,85,247,.3),inset 0 1px 0 rgba(255,255,255,.1);transition:all .22s;text-decoration:none}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(168,85,247,.48)}
+
+.section-divider{height:1px;background:var(--border);margin:32px 0}
+
+.glow-b{position:fixed;bottom:60px;right:60px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(6,182,212,.04) 0%,transparent 70%);pointer-events:none;z-index:-1}
+</style>
+</head>
+<body>
+<div class="glow-b"></div>
+
+<div class="app-shell">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">phosor<em>.</em>ai</div>
+    <div class="sidebar-sect">Workspace</div>
+    <a href="01-homepage.html" class="sidebar-item">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 6.5L8 2l6 4.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V6.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+      Home
+    </a>
+    <div class="sidebar-sect">Projects</div>
+    <div>
+      <div class="proj-header open" onclick="toggleProj(this)">
+        <span class="proj-chev open">▶</span><span style="font-size:15px">🎬</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Echoes of Aurora</span>
+      </div>
+      <div class="proj-children">
+        <a href="02-creation-flow.html" class="proj-sub active">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 4.5H14l-3.7 2.7 1.4 4.3L8 11l-3.7 2.5 1.4-4.3L2 6.5h4.5L8 2z" fill="currentColor" opacity=".7"/></svg>Creation
+        </a>
+        <a href="08-timeline-editor.html" class="proj-sub">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><rect x="1" y="6" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="10" width="14" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>Timeline
+        </a>
+      </div>
+    </div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌃</span><span style="flex:1;color:var(--muted)">Neon District</span></div></div>
+    <div><div class="proj-header" onclick="toggleProj(this)"><span class="proj-chev">▶</span><span style="font-size:15px">🌊</span><span style="flex:1;color:var(--muted)">Deep Current</span></div></div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-avatar">H</div>
+      <div><div style="font-size:13px;font-weight:500;color:var(--text2)">Hugo</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">Pro Plan</div></div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-bc">
+        <span>Echoes of Aurora</span><span style="color:var(--muted)">›</span>
+        <span class="topbar-bc-cur">Scripts &amp; Prompts</span>
+      </div>
+      <div class="topbar-steps">
+        <div class="step-pip"><a href="02-creation-flow.html" class="step-btn clickable done"><div class="step-num">1</div><span>Input</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><a href="03-configure.html" class="step-btn clickable done"><div class="step-num">2</div><span>Configure</span></a><div class="step-line done"></div></div>
+        <div class="step-pip"><div class="step-btn active"><div class="step-num">3</div><span>Scripts</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">4</div><span>Assets</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">5</div><span>Video</span></div><div class="step-line"></div></div>
+        <div class="step-pip"><div class="step-btn"><div class="step-num">6</div><span>Merge</span></div></div>
+      </div>
+    </div>
+
+    <div class="content-scroll">
+      <div class="content-inner">
+
+        <div class="page-header">
+          <div class="step-badge"><div class="step-badge-num">3</div>Scripts &amp; Prompts</div>
+          <h1 class="page-title">Script generated</h1>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-pill green"><div class="stat-num">18</div><div class="stat-lbl">Shots</div></div>
+          <div class="stat-pill"><div class="stat-num">4</div><div class="stat-lbl">Scenes</div></div>
+          <div class="stat-pill"><div class="stat-num">5</div><div class="stat-lbl">Characters</div></div>
+          <div class="stat-pill"><div class="stat-num" style="color:var(--electric)">~7 min</div><div class="stat-lbl">Est. Time</div></div>
+        </div>
+
+        <!-- ACCORDIONS -->
+        <div class="accordion">
+
+          <!-- Script -->
+          <div class="acc-item">
+            <div class="acc-header" onclick="toggleAcc(this)">
+              <div class="acc-icon" style="background:rgba(168,85,247,.12)">📝</div>
+              <div>
+                <span class="acc-title">Script</span>
+                <span class="acc-count">1 file</span>
+              </div>
+              <div class="acc-status">✅ Generated</div>
+              <svg class="acc-chev" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="acc-content">
+              <div class="acc-body">
+                <textarea class="script-text-area" rows="10">INT. SPACE STATION AURORA — COMMS BAY — EMERGENCY LIGHTING
+
+Commander Elena Vasquez, 42, drifts through zero gravity amid sparking consoles. Hull panels groan. The last functioning comms array glows amber in the dark.
+
+ELENA
+(into headset, steady voice)
+Houston. This is Aurora Station. Last transmission window. Please confirm receipt.
+
+STATIC. Fourteen seconds of it. Then—a voice. Her own voice. Five years younger.
+
+ELENA (V.O.)
+Elena. Don't be afraid.
+
+She freezes. The voice is unmistakably hers—but warmer, more certain. A message returned through time's static.
+
+ELENA
+(whispering)
+...How?
+
+ELENA (V.O.)
+You already know how this ends. Say the words. They need to hear them.
+
+She looks at the porthole. Earth, blue and indifferent, hangs in the void. She understands. The signal she received years ago—the one that saved her—was always going to be the one she sent now.</textarea>
+                <div style="display:flex;gap:8px;margin-top:10px">
+                  <button style="padding:7px 14px;border-radius:7px;font-size:12.5px;border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer">↺ Regenerate</button>
+                  <button style="padding:7px 14px;border-radius:7px;font-size:12.5px;border:1px solid rgba(6,182,212,.25);background:rgba(6,182,212,.05);color:var(--electric);cursor:pointer">✓ Save Changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shots -->
+          <div class="acc-item">
+            <div class="acc-header" onclick="toggleAcc(this)">
+              <div class="acc-icon" style="background:rgba(6,182,212,.1)">🎬</div>
+              <div>
+                <span class="acc-title">Shots</span>
+                <span class="acc-count">18 shots</span>
+              </div>
+              <div class="acc-status">✅ Generated</div>
+              <svg class="acc-chev" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="acc-content">
+              <div class="acc-body">
+                <table class="shots-table">
+                  <thead>
+                    <tr>
+                      <th>Shot</th><th>Scene</th><th>Type</th><th>Dialog / Action</th><th>Duration</th><th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td class="shot-num">01</td><td>Comms Bay</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">WIDE</td><td>Station interior, emergency lights, Elena drifts toward console</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">7s</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                    <tr><td class="shot-num">02</td><td>Comms Bay</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">CU</td><td>"Houston. This is Aurora Station."</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">6s</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                    <tr><td class="shot-num">03</td><td>Comms Bay</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">ECU</td><td>Hands reaching for comms panel, sparks</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">4s</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                    <tr><td class="shot-num">04</td><td>Comms Bay</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">WIDE</td><td>Static on console screen, 14-second silence</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">8s</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                    <tr><td class="shot-num">05</td><td>Comms Bay</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">CU</td><td>"Elena. Don't be afraid." — voice returns</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">5s</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                    <tr><td class="shot-num">06–18</td><td>Various</td><td style="color:var(--muted);font-family:var(--mono);font-size:11px">MIXED</td><td style="color:var(--muted);font-style:italic">13 more shots…</td><td style="font-family:var(--mono);font-size:12px;color:var(--muted)">—</td><td><button class="shot-edit-btn">✏️</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI-Shots -->
+          <div class="acc-item">
+            <div class="acc-header" onclick="toggleAcc(this)">
+              <div class="acc-icon" style="background:rgba(212,175,106,.1)">✦</div>
+              <div>
+                <span class="acc-title">AI-Shots</span>
+                <span class="acc-count">18 optimized</span>
+              </div>
+              <div class="acc-status">✅ Generated</div>
+              <svg class="acc-chev" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="acc-content">
+              <div class="acc-body">
+                <div style="padding:14px 0 10px;font-size:13px;color:var(--muted2);line-height:1.6;border-bottom:1px solid var(--border);margin-bottom:14px">
+                  <strong style="color:var(--text2)">Visual Reference:</strong> Gravity (2013) × Moon (2009) × Interstellar (2014)<br>
+                  <strong style="color:var(--text2)">Color Palette:</strong> Deep space blacks, amber emergency glow, ice-blue Earth reflections<br>
+                  <strong style="color:var(--text2)">Emotional Arc:</strong> Despair → Confusion → Recognition → Peace
+                </div>
+                <div class="ai-shots-grid">
+                  <div class="ai-shot-card">
+                    <div class="ai-shot-label">SHOT 01 · Wide Establishing</div>
+                    <div class="ai-shot-text">Interior space station comms bay, emergency lighting amber and deep red, zero-gravity debris floating, cinematic lens flare from porthole, photorealistic, 8k detail</div>
+                  </div>
+                  <div class="ai-shot-card">
+                    <div class="ai-shot-label">SHOT 02 · Extreme Close-Up</div>
+                    <div class="ai-shot-text">Female astronaut face, weathered but resolute, helmet visor reflecting blue Earth, volumetric amber lighting, film grain, shallow depth of field</div>
+                  </div>
+                  <div class="ai-shot-card">
+                    <div class="ai-shot-label">SHOT 03 · POV Detail</div>
+                    <div class="ai-shot-text">POV hands reaching for glowing communication panel, sparks cascading, urgency, shallow depth of field, warm backlight, cinematic</div>
+                  </div>
+                  <div class="ai-shot-card" style="border-color:rgba(255,255,255,.04);background:transparent">
+                    <div class="ai-shot-label" style="color:var(--muted)">SHOTS 04–18 · 15 more shots…</div>
+                    <button style="margin-top:6px;padding:5px 12px;border-radius:6px;font-size:12px;border:1px solid var(--border2);background:none;color:var(--muted2);cursor:pointer">View all shots</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prompts -->
+          <div class="acc-item">
+            <div class="acc-header" onclick="toggleAcc(this)">
+              <div class="acc-icon" style="background:rgba(16,185,129,.1)">⚡</div>
+              <div>
+                <span class="acc-title">Prompts</span>
+                <span class="acc-count">18 image prompts</span>
+              </div>
+              <div class="acc-status">✅ Generated</div>
+              <svg class="acc-chev" viewBox="0 0 16 16" fill="none"><path d="M3 6l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="acc-content">
+              <div class="acc-body">
+                <div class="prompts-list">
+                  <div class="prompt-item">
+                    <div class="prompt-item-head">
+                      <span class="prompt-shot-lbl">SHOT 01</span>
+                      <span style="font-size:11px;color:var(--muted)">Image · First frame</span>
+                    </div>
+                    <textarea class="prompt-inline" rows="2">Interior space station comms bay, emergency lighting amber and deep red, zero-gravity debris floating, cinematic lens flare from porthole, photorealistic, 8k detail, film grain, cold blue earth glow from porthole</textarea>
+                  </div>
+                  <div class="prompt-item">
+                    <div class="prompt-item-head">
+                      <span class="prompt-shot-lbl">SHOT 02</span>
+                      <span style="font-size:11px;color:var(--muted)">Image · First frame</span>
+                    </div>
+                    <textarea class="prompt-inline" rows="2">Extreme close-up female astronaut face, weathered but resolute, helmet visor reflecting blue Earth through porthole, volumetric amber lighting, film grain, shallow depth of field, photorealistic</textarea>
+                  </div>
+                  <div class="prompt-item">
+                    <div class="prompt-item-head">
+                      <span class="prompt-shot-lbl">SHOT 03</span>
+                      <span style="font-size:11px;color:var(--muted)">Image · First frame</span>
+                    </div>
+                    <textarea class="prompt-inline" rows="2">POV astronaut hands reaching for glowing communication panel, sparks, urgency, shallow depth of field, warm backlight, cinematic, 8k, amber emergency glow</textarea>
+                  </div>
+                  <div class="prompt-item" style="background:transparent;border-color:rgba(255,255,255,.04)">
+                    <span style="font-size:12px;color:var(--muted);font-family:var(--mono)">15 more prompts hidden — click to expand all</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /accordion -->
+
+        <div class="section-divider"></div>
+
+        <div style="display:flex;align-items:center;gap:14px">
+          <a href="05-assets.html" class="btn-primary">
+            Start Generating Assets
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="03-configure.html" style="font-size:13.5px;color:var(--muted2);text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--text2)'" onmouseout="this.style.color='var(--muted2)'">← Back to Configure</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAcc(hdr){
+  const content=hdr.nextElementSibling;
+  const chev=hdr.querySelector('.acc-chev');
+  content.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+function toggleProj(h){
+  h.classList.toggle('open');
+  h.querySelector('.proj-chev').classList.toggle('open');
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display=h.classList.contains('open')?'block':'none';
+}
+document.querySelectorAll('.proj-header:not(.open)').forEach(h=>{
+  const c=h.nextElementSibling;
+  if(c&&c.classList.contains('proj-children')) c.style.display='none';
+});
+</script>
+</body>
+</html>
